@@ -1,0 +1,1294 @@
+<style>
+th {
+	font-weight: normal;
+	position: relative;
+}
+.i-arrows {
+	position: fixed;
+	bottom: 24px;
+	display:none;
+}
+.ms-link  {
+	color: #333;
+}
+td.fixed-td div,td.fixed-tr div{
+	max-height: 1rem;
+}
+.fixed-td {
+	max-width: 180px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	padding: 2px 1px 0 1px !important;
+}
+.fixed-tr {
+	max-width: 30vw;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	padding: 2px 1px 0 1px !important;
+}
+.modal-form {
+    z-index: 199;
+}
+.edit {
+	border: 1px solid lightgray;
+	border-radius: 5px;
+	width: max-content;
+	max-width: 266px;
+	padding: 15px;
+	list-style-type: none;
+	margin-bottom: 0;
+}
+.edit-table {
+	position: fixed;
+	background-color: #fff;
+}
+.edit-сolumn {
+	position: fixed;
+	background-color: #fff;
+}
+.edit li:hover {
+	box-shadow: 5px 5px 20px 5px rgba(169, 176, 181, 0.2);
+	border-radius: 5px;
+}
+.edit a {
+	color: #777777;
+	font-size: 12px;
+	text-decoration: none;
+}
+.edit li {
+	padding: 4px;
+	margin-bottom: 10px;
+}
+.th-plus {
+	cursor: pointer;
+	font-size: 24px;
+	font-weight: 600;
+	text-align: center;
+}
+.input-add {
+	display: flex;
+	flex-direction: column;
+}
+.table thead th {
+	border: 1px solid #dee2e6;
+	vertical-align: middle;
+	text-align: center;
+	padding-top: 0;
+	padding-bottom: 0;
+}
+.table td {
+	border: 1px solid #dee2e6;
+}
+.table td:last-child {
+	/*border: none;*/
+}
+.edit-btn {
+	position: absolute;
+	right: 3px;
+	top: 0;
+	display: inline-flex;
+}
+.edit-btn-column:hover,.edit-btn-table:hover{
+	cursor: pointer;
+	background-color: #e7e7e7;
+	border-radius:6px;
+}
+.add-select {
+   font-size: 18px;
+}
+.adding-new-req-form {
+	display: flex;
+	flex-direction: column;
+	font-size: 18px;
+}
+.new-col{
+	position:absolute;
+	right:0;
+	z-index: 10;
+	border: 1px solid lightgray;
+	border-radius: 5px;
+	background-color: white;
+	width: max-content;
+	padding: 15px;
+}
+.i-edit{
+	display: none;
+	position:absolute;
+	right:0;
+}
+.breadcrumb {
+	padding: 2px;
+	margin: 0;
+}
+.data_row:hover{
+	background-color: #fafafa;
+}
+.col-header {
+	padding-top: 8px;
+	padding-bottom: 8px;
+}
+.nodeco:hover {
+	text-decoration: none;
+	font-weight: 500;
+}
+.controls-left a:hover {
+	background-color:#f7f7f7;
+	border-radius:5px;
+	text-decoration: none;
+}
+#typesBox {
+	border: 1px solid lightgray;
+	border-radius: 5px;
+	width: max-content;
+	max-width: 266px;
+	padding: 10px;
+	list-style-type: none;
+	margin-bottom: 0px;
+	position: absolute;
+	background-color: white;
+	display: none;
+}
+#default_limit {
+	width: 50px;
+	text-align: end;
+	-moz-appearance: textfield;
+}
+#default_limit::-webkit-outer-spin-button,
+#default_limit::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+</style>
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+	<li class="breadcrumb-item">
+		<a href="/{_global_.z}">
+			<svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-top: -4px;">
+			<path d="M8.64286 18.8571V11H13.3571V18.8571M3.92857 8.64282L11 3.14282L18.0714 8.64282V17.2857C18.0714 17.7024 17.9059 18.1021 17.6112 18.3968C17.3165 18.6915 16.9168 18.8571 16.5 18.8571H5.5C5.08323 18.8571 4.68353 18.6915 4.38883 18.3968C4.09413 18.1021 3.92857 17.7024 3.92857 17.2857V8.64282Z" stroke="#1A1A1A" stroke-linecap="round" stroke-linejoin="round"/>
+			</svg>
+		</a>
+	</li>
+	<li class="breadcrumb-item"><a href="/{_global_.z}/dict/"><t9n>[RU]Таблицы[EN]Tables</t9n></a></li>
+	<li class="breadcrumb-item parent-table" style="display:none"><a href="/{_global_.z}/object/"></a></li>
+	<li class="breadcrumb-item parent-object" style="display:none"><a href="/{_global_.z}/edit_obj/"></a></li>
+	<li class="breadcrumb-item active" aria-current="page">{_parent_.title}</li>
+  </ol>
+</nav>
+<script src="/js/freeze-table.js"></script>
+<script>
+function showEdit(){
+	$(event.target).closest('tr').find('.i-edit').show();
+}
+function hideEdit(){
+	$('.i-edit').hide();
+}
+function tbSize(v) {
+	document.cookie = 'tb_size='+v+'; path=/{_global_.z}; max-age=31622400';
+	$('#tb').css('font-size',v+'px');
+}
+function tipsOff(v) {
+	document.cookie = 'tips_off='+v+'; path=/{_global_.z}; max-age=31622400';
+	$('.tips-text,.settings').toggle();
+}
+if(getCookie('tips_off')==='1')
+	$("<style>.tips-text{display:none;}</style>").appendTo("head");
+</script>
+<div class="alert alert-warning hidden" id="warn" role="alert"></div>
+<!-- Begin:&Uni_obj -->
+<div id="controls" style="z-index: 99; position: relative;" class="controls t9n">
+	<div class="controls-left">
+		<a btn="plus.png" class="display-{CREATE_GRANTED}" onclick="$('#add,#controls').toggle();byId('t{TYP}').focus()" title="<t9n>[RU]Добавить запись в таблицу[EN]Create a record in the table</t9n>">
+			<svg width="26" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<path d="M14 7V21M7 14H21" stroke="#1A1A1A" stroke-linecap="round" stroke-linejoin="round"/>
+			</svg><small class="tips-text"><font color="#1A1A1A"><t9n>[RU]Добавить[EN]Create</t9n></font></small>
+		</a>
+		<a btn="filter.png" onclick="if($('#filter_row').hasClass('hidden'))$('.filter_row,#clearSearch').removeClass('hidden');else sendForm()" title="<t9n>[RU]Показать / применить фильтры[EN]Show / apply filters</t9n>">
+			<svg width="26" height="28" viewBox="0 0 26 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<path d="M23 23L18.65 18.65M21 13C21 17.4183 17.4183 21 13 21C8.58172 21 5 17.4183 5 13C5 8.58172 8.58172 5 13 5C17.4183 5 21 8.58172 21 13Z" stroke="#1A1A1A" stroke-linecap="round" stroke-linejoin="round"/>
+			</svg><small class="tips-text"><font color="#1A1A1A"><t9n>[RU]Искать[EN]Search</t9n></font></small>
+		</a>
+		<a btn="clear-filters.png" href="/{_global_.z}/object/{ID}/?F_U={F_U}" id="clearSearch" class="hidden" title="<t9n>[RU]Очистить фильтр и сортировку[EN]Clear the filter and sort</t9n>">
+			<svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<path d="M23 23L18.65 18.65M21 13C21 17.4183 17.4183 21 13 21C8.58172 21 5 17.4183 5 13C5 8.58172 8.58172 5 13 5C17.4183 5 21 8.58172 21 13Z" stroke="#1A1A1A" stroke-linecap="round" stroke-linejoin="round"/>
+			<path d="M10 10L17 17M17 10L10 17" stroke="#1A1A1A" stroke-linecap="round" stroke-linejoin="round"/>
+			</svg><small class="tips-text"><font color="#1A1A1A"><t9n>[RU]Очистить[EN]Clear</t9n></font></small>
+		</a>
+		<a btn="refresh.png" onclick="sendForm()" title="<t9n>[RU]Обновить отображение таблицы (что в ней изменили другие пользователи)[EN]Refresh the table view (see the updates from other users)</t9n>">
+			<svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<path d="M25 5.99763V11.9976M25 11.9976H19M25 11.9976L20.36 7.63763C19.2853 6.56235 17.9556 5.77684 16.4952 5.35441C15.0348 4.93198 13.4911 4.88639 12.0083 5.22189C10.5255 5.5574 9.1518 6.26307 8.01547 7.27305C6.87913 8.28304 6.01717 9.56442 5.51 10.9976M3 21.9976V15.9976M3 15.9976H9M3 15.9976L7.64 20.3576C8.71475 21.4329 10.0444 22.2184 11.5048 22.6409C12.9652 23.0633 14.5089 23.1089 15.9917 22.7734C17.4745 22.4379 18.8482 21.7322 19.9845 20.7222C21.1209 19.7122 21.9828 18.4308 22.49 16.9976" stroke="#1A1A1A" stroke-linecap="round" stroke-linejoin="round"/>
+			</svg><small class="tips-text"><font color="#1A1A1A"><t9n>[RU]Обновить[EN]Refresh</t9n></font></small>
+		</a>
+		<a btn="flow-chart.png" title="<t9n>[RU]Показать связи&nbsp;&mdash; откуда могут быть ссылки на записи этой таблицы[EN]Show the links to records of this table</t9n>" onclick="byId('lnx').value=byId('lnx').value^1;sendForm()">
+			<svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<path d="M17 9H20C20.6566 9 21.3068 9.12933 21.9134 9.3806C22.52 9.63188 23.0712 10.0002 23.5355 10.4645C23.9998 10.9288 24.3681 11.48 24.6194 12.0866C24.8707 12.6932 25 13.3434 25 14C25 14.6566 24.8707 15.3068 24.6194 15.9134C24.3681 16.52 23.9998 17.0712 23.5355 17.5355C23.0712 17.9998 22.52 18.3681 21.9134 18.6194C21.3068 18.8707 20.6566 19 20 19H17M11 19H8C7.34339 19 6.69321 18.8707 6.08658 18.6194C5.47995 18.3681 4.92876 17.9998 4.46447 17.5355C3.52678 16.5979 3 15.3261 3 14C3 12.6739 3.52678 11.4021 4.46447 10.4645C5.40215 9.52678 6.67392 9 8 9H11M10 14H18" stroke="#1A1A1A" stroke-linecap="round" stroke-linejoin="round"/>
+			</svg><small class="tips-text"><font color="#1A1A1A"><t9n>[RU]Связи[EN]References</t9n></font></small>
+		</a>
+		<a btn="resize.png" onclick="tbCompact('1')" id="resize" title="<t9n>[RU]Просторный режим ячеек[EN]Broad cell mode</t9n>" style="display:none">
+			<svg width="28" height="28" viewBox="0 0 26 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<path d="M17 5H23M23 5V11M23 5L16 12M11 23H5M5 23V17M5 23L12 16" stroke="#1A1A1A" stroke-linecap="round" stroke-linejoin="round"/>
+			</svg><small class="tips-text"><font color="#1A1A1A"><t9n>[RU]Просторно[EN]Broaden</t9n></font></small>
+		</a>
+		<a btn="collapse.png" onclick="tbCompact('2')" id="collapse" title="<t9n>[RU]Компактный режим ячеек[EN]Compact cell mode</t9n>">
+			<svg width="28" height="28" viewBox="0 0 26 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<path d="M6 16H12M12 16V22M12 16L5 23M22 12H16M16 12V6M16 12L23 5" stroke="#1A1A1A" stroke-linecap="round" stroke-linejoin="round"/>
+			</svg><small class="tips-text"><font color="#1A1A1A"><t9n>[RU]Компактно[EN]Shrink cells</t9n></font></small>
+		</a>
+		<a btn="fixed.png" onclick="tbCompact('3')" id="fixed" title="<t9n>[RU]Фиксированная высота ячеек[EN]Fixed cell heigth</t9n>" style="display:none">
+			<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28">
+			 <g>
+			  <g transform="rotate(90 13 14)" stroke="#1a1a1a">
+			   <line y2="24.06244" x2="3.06252" y1="4.18747" x1="2.87502" fill="none"/>
+			   <line y2="23.93744" x2="23.74998" y1="4.31247" x1="23.49998" fill="none"/>
+			   <line y2="13.99995" x2="19.68749" y1="14.12495" x1="7.43751" fill="none"/>
+			   <line y2="16.31245" x2="17.68749" y1="13.49996" x1="20.06249" fill="none"/>
+			   <line y2="13.62495" x2="6.93751" y1="16.43745" x1="9.43751" fill="none"/>
+			   <line y2="11.43746" x2="17.56249" y1="14.24995" x1="20.06249" fill="none"/>
+			   <line y2="14.37495" x2="7.00001" y1="11.56246" x1="9.37501" fill="none"/>
+			  </g>
+			 </g>
+			</svg><small class="tips-text"><font color="#1A1A1A"><t9n>[RU]Фиксировано[EN]Fixed heigth</t9n></font></small>
+		</a>
+		<a btn="ultra.png" onclick="tbCompact('4')" id="ultra" title="<t9n>[RU]Ограниченная ширина ячеек[EN]Fixed cell width</t9n>" style="display:none">
+			<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" stroke="#1a1a1a">
+			 <g>
+			  <line  y2="24.06244" x2="3.06252" y1="4.18747" x1="2.87502"  fill="none"/>
+			  <line  y2="23.93744" x2="23.74998" y1="4.31247" x1="23.49998" fill="none"/>
+			  <line  y2="13.99995" x2="19.68749" y1="14.12495" x1="7.43751" fill="none"/>
+			  <line  y2="16.31245" x2="17.68749" y1="13.49996" x1="20.06249" fill="none"/>
+			  <line  y2="13.62495" x2="6.93751" y1="16.43745" x1="9.43751" fill="none"/>
+			  <line  y2="11.43746" x2="17.56249" y1="14.24995" x1="20.06249" fill="none"/>
+			  <line  y2="14.37495" x2="7.00001" y1="11.56246" x1="9.37501" fill="none"/>
+			 </g>
+			</svg><small class="tips-text"><font color="#1A1A1A"><t9n>[RU]Фикс. ширина[EN]Fixed width</t9n></font></small>
+		</a>
+		<a btn="view-details.png" title="<t9n>[RU]Не сокращать содержимое ячеек до 127 символов[EN]Display full cell content, not limited to 127 chars</t9n>" id="limit-text" onclick="byId('full').value=byId('full').value?'':1;sendForm()">
+			<svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<path d="M19 12H5M23 8H5M23 16H5M19 20H5" stroke="#1A1A1A" stroke-linecap="round" stroke-linejoin="round"/>
+			</svg>
+			<small class="tips-text"><font color="#1A1A1A"><t9n>[RU]Не сокращать[EN]Full text</t9n></font></small>
+		</a>
+		<a btn="view-details.png" title="<t9n>[RU]Сокращать отображаемое содержимое ячеек[EN]Limit the displayed cell content</t9n>" id="full-text" onclick="byId('full').value=byId('full').value?1:'';sendForm()" style="display:none">
+			<svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<path d="M5 14H23M5 8H23M5 20H23" stroke="#1A1A1A" stroke-linecap="round" stroke-linejoin="round"/>
+			</svg><small class="tips-text"><font color="#1A1A1A"><t9n>[RU]Cократить[EN]Limit text</t9n></font></small>
+		</a>
+		<!-- Begin:&EXPORT -->{OK}
+			<a btn="export-csv.png" title="<t9n>[RU]Экспорт в файл CSV[EN]Export CSV format</t9n>" onclick="byId('exp').name='csv';sendForm()">
+				<svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<path d="M23 17.0002V21.0002C23 21.5306 22.7893 22.0393 22.4142 22.4144C22.0391 22.7895 21.5304 23.0002 21 23.0002H7C6.46957 23.0002 5.96086 22.7895 5.58579 22.4144C5.21071 22.0393 5 21.5306 5 21.0002V17.0002M9 12.0001L14 17.0001M14 17.0001L19 12.0001M14 17.0001V5.00009" stroke="#1A1A1A" stroke-linecap="round" stroke-linejoin="round"/>
+				</svg><small class="tips-text"><font color="#1A1A1A"><t9n>[RU]Скачать CSV[EN]Dump CSV</t9n></font></small>
+			</a>
+			<a btn="database-export.png" title="<t9n>[RU]Экспорт файла BKI[EN]Export BKI file</t9n>" onclick="byId('exp').name='bki';sendForm()">
+				<svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<path d="M10.009 19.0117L14.009 23.0117M14.009 23.0117L18.009 19.0117M14.009 23.0117V14.0117M22.889 20.1017C23.7584 19.4904 24.4103 18.6179 24.7503 17.6109C25.0902 16.6039 25.1004 15.5147 24.7794 14.5015C24.4584 13.4883 23.8228 12.6038 22.965 11.9763C22.1072 11.3487 21.0718 11.0109 20.009 11.0117H18.749C18.4482 9.83959 17.8855 8.75096 17.1031 7.82779C16.3207 6.90463 15.3391 6.17097 14.2322 5.68207C13.1252 5.19316 11.9218 4.96174 10.7125 5.00523C9.50317 5.04872 8.31948 5.36598 7.25052 5.93314C6.18156 6.50029 5.25519 7.30256 4.54115 8.27954C3.82712 9.25652 3.34402 10.3828 3.12823 11.5735C2.91244 12.7642 2.96958 13.9883 3.29535 15.1537C3.62112 16.3192 4.20703 17.3955 5.00897 18.3017" stroke="#1A1A1A" stroke-linecap="round" stroke-linejoin="round"/>
+				</svg><small class="tips-text"><font color="#1A1A1A"><t9n>[RU]Экспорт BKI[EN]Export BKI</t9n></font></small>
+			</a>
+			<a btn="database-restore.png" title="<t9n>[RU]Импорт файла BKI[EN]Import BKI file</t9n>" onclick="$('#bki').toggleClass('hidden');$('#controls').toggleClass('hidden')">
+				<svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<path d="M18.0053 17.9976L14.0053 13.9976M14.0053 13.9976L10.0053 17.9976M14.0053 13.9976V22.9976M22.3953 20.3876C23.3707 19.8559 24.1412 19.0145 24.5852 17.9963C25.0292 16.978 25.1215 15.8409 24.8475 14.7643C24.5735 13.6878 23.9488 12.7331 23.072 12.0511C22.1952 11.369 21.1162 10.9984 20.0053 10.9976H18.7453C18.4426 9.82688 17.8785 8.73997 17.0953 7.81863C16.3121 6.89729 15.3302 6.16548 14.2234 5.67824C13.1167 5.191 11.9139 4.96099 10.7054 5.00552C9.49701 5.05004 8.3144 5.36793 7.24651 5.9353C6.17862 6.50266 5.25324 7.30474 4.53995 8.28122C3.82666 9.25769 3.34402 10.3832 3.12831 11.573C2.9126 12.7629 2.96944 13.9862 3.29454 15.1509C3.61965 16.3156 4.20457 17.3915 5.00533 18.2976" stroke="#1A1A1A" stroke-linecap="round" stroke-linejoin="round"/>
+				</svg><small class="tips-text"><font color="#1A1A1A"><t9n>[RU]Импорт BKI[EN]Import BKI</t9n></font></small>
+			</a>
+		<!-- End:&EXPORT -->
+		<!-- Begin:&DELETE -->{OK}
+			<a btn="delete.png" id="del" title="<t9n>[RU]Удалить записи, удовлетворяющие заданному фильтру[EN]Delete the selection</t9n>" onclick="count2del();$('#controls').toggleClass('hidden');$('#confirm_del').toggleClass('hidden')">
+				<svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<path d="M5 8H7M7 8H23M7 8V22C7 22.5304 7.21071 23.0391 7.58579 23.4142C7.96086 23.7893 8.46957 24 9 24H19C19.5304 24 20.0391 23.7893 20.4142 23.4142C20.7893 23.0391 21 22.5304 21 22V8H7ZM10 8V6C10 5.46957 10.2107 4.96086 10.5858 4.58579C10.9609 4.21071 11.4696 4 12 4H16C16.5304 4 17.0391 4.21071 17.4142 4.58579C17.7893 4.96086 18 5.46957 18 6V8M12 13V19M16 13V19" stroke="#1A1A1A" stroke-linecap="round" stroke-linejoin="round"/>
+				</svg><small class="tips-text"><font color="#1A1A1A"><t9n>[RU]Удалить[EN]Delete</t9n></font></small>
+			</a>
+		<!-- End:&DELETE -->
+	</div>
+	<div class="controls-right ml-2">
+		<a btn="settings.png" onclick="$('.settings').toggle()" title="<t9n>[RU]Настройки панели управления[EN]Control panel settings</t9n>">
+			<svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<path d="M14 17C15.6569 17 17 15.6569 17 14C17 12.3431 15.6569 11 14 11C12.3431 11 11 12.3431 11 14C11 15.6569 12.3431 17 14 17Z" stroke="#1A1A1A" stroke-linecap="round" stroke-linejoin="round"/>
+				<path d="M21.4 17C21.2669 17.3016 21.2272 17.6362 21.286 17.9606C21.3448 18.285 21.4995 18.5843 21.73 18.82L21.79 18.88C21.976 19.0657 22.1235 19.2863 22.2241 19.5291C22.3248 19.7719 22.3766 20.0322 22.3766 20.295C22.3766 20.5578 22.3248 20.8181 22.2241 21.0609C22.1235 21.3037 21.976 21.5243 21.79 21.71C21.6043 21.896 21.3837 22.0435 21.1409 22.1441C20.8981 22.2448 20.6378 22.2966 20.375 22.2966C20.1122 22.2966 19.8519 22.2448 19.6091 22.1441C19.3663 22.0435 19.1457 21.896 18.96 21.71L18.9 21.65C18.6643 21.4195 18.365 21.2648 18.0406 21.206C17.7162 21.1472 17.3816 21.1869 17.08 21.32C16.7842 21.4468 16.532 21.6572 16.3543 21.9255C16.1766 22.1938 16.0813 22.5082 16.08 22.83V23C16.08 23.5304 15.8693 24.0391 15.4942 24.4142C15.1191 24.7893 14.6104 25 14.08 25C13.5496 25 13.0409 24.7893 12.6658 24.4142C12.2907 24.0391 12.08 23.5304 12.08 23V22.91C12.0723 22.579 11.9651 22.258 11.7725 21.9887C11.5799 21.7194 11.3107 21.5143 11 21.4C10.6984 21.2669 10.3638 21.2272 10.0394 21.286C9.71502 21.3448 9.41568 21.4995 9.18 21.73L9.12 21.79C8.93425 21.976 8.71368 22.1235 8.47088 22.2241C8.22808 22.3248 7.96783 22.3766 7.705 22.3766C7.44217 22.3766 7.18192 22.3248 6.93912 22.2241C6.69632 22.1235 6.47575 21.976 6.29 21.79C6.10405 21.6043 5.95653 21.3837 5.85588 21.1409C5.75523 20.8981 5.70343 20.6378 5.70343 20.375C5.70343 20.1122 5.75523 19.8519 5.85588 19.6091C5.95653 19.3663 6.10405 19.1457 6.29 18.96L6.35 18.9C6.58054 18.6643 6.73519 18.365 6.794 18.0406C6.85282 17.7162 6.81312 17.3816 6.68 17.08C6.55324 16.7842 6.34276 16.532 6.07447 16.3543C5.80618 16.1766 5.49179 16.0813 5.17 16.08H5C4.46957 16.08 3.96086 15.8693 3.58579 15.4942C3.21071 15.1191 3 14.6104 3 14.08C3 13.5496 3.21071 13.0409 3.58579 12.6658C3.96086 12.2907 4.46957 12.08 5 12.08H5.09C5.42099 12.0723 5.742 11.9651 6.0113 11.7725C6.28059 11.5799 6.48572 11.3107 6.6 11C6.73312 10.6984 6.77282 10.3638 6.714 10.0394C6.65519 9.71502 6.50054 9.41568 6.27 9.18L6.21 9.12C6.02405 8.93425 5.87653 8.71368 5.77588 8.47088C5.67523 8.22808 5.62343 7.96783 5.62343 7.705C5.62343 7.44217 5.67523 7.18192 5.77588 6.93912C5.87653 6.69632 6.02405 6.47575 6.21 6.29C6.39575 6.10405 6.61632 5.95653 6.85912 5.85588C7.10192 5.75523 7.36217 5.70343 7.625 5.70343C7.88783 5.70343 8.14808 5.75523 8.39088 5.85588C8.63368 5.95653 8.85425 6.10405 9.04 6.29L9.1 6.35C9.33568 6.58054 9.63502 6.73519 9.95941 6.794C10.2838 6.85282 10.6184 6.81312 10.92 6.68H11C11.2958 6.55324 11.548 6.34276 11.7257 6.07447C11.9034 5.80618 11.9987 5.49179 12 5.17V5C12 4.46957 12.2107 3.96086 12.5858 3.58579C12.9609 3.21071 13.4696 3 14 3C14.5304 3 15.0391 3.21071 15.4142 3.58579C15.7893 3.96086 16 4.46957 16 5V5.09C16.0013 5.41179 16.0966 5.72618 16.2743 5.99447C16.452 6.26276 16.7042 6.47324 17 6.6C17.3016 6.73312 17.6362 6.77282 17.9606 6.714C18.285 6.65519 18.5843 6.50054 18.82 6.27L18.88 6.21C19.0657 6.02405 19.2863 5.87653 19.5291 5.77588C19.7719 5.67523 20.0322 5.62343 20.295 5.62343C20.5578 5.62343 20.8181 5.67523 21.0609 5.77588C21.3037 5.87653 21.5243 6.02405 21.71 6.21C21.896 6.39575 22.0435 6.61632 22.1441 6.85912C22.2448 7.10192 22.2966 7.36217 22.2966 7.625C22.2966 7.88783 22.2448 8.14808 22.1441 8.39088C22.0435 8.63368 21.896 8.85425 21.71 9.04L21.65 9.1C21.4195 9.33568 21.2648 9.63502 21.206 9.95941C21.1472 10.2838 21.1869 10.6184 21.32 10.92V11C21.4468 11.2958 21.6572 11.548 21.9255 11.7257C22.1938 11.9034 22.5082 11.9987 22.83 12H23C23.5304 12 24.0391 12.2107 24.4142 12.5858C24.7893 12.9609 25 13.4696 25 14C25 14.5304 24.7893 15.0391 24.4142 15.4142C24.0391 15.7893 23.5304 16 23 16H22.91C22.5882 16.0013 22.2738 16.0966 22.0055 16.2743C21.7372 16.452 21.5268 16.7042 21.4 17Z" stroke="#1A1A1A" stroke-linecap="round" stroke-linejoin="round"/>
+			</svg>
+		</a>
+		<select id="tipsOff" onchange="tipsOff(this.value)" class="settings form-control" style="display:none">
+			<option value="">Подписи к кнопкам меню</option>
+			<option value="1">Убрать подписи кнопок</option>
+		</select>
+		<select id="tbSize" onchange="tbSize(this.value)" class="settings form-control" style="display:none">
+			<option value="12">12px</option>
+			<option value="13">13px</option>
+			<option value="14">14px</option>
+			<option value="15">15px</option>
+			<option value="16">16px</option>
+			<option value="18">18px</option>
+		</select>
+	</div>
+</div>
+<!-- Begin:&Uni_obj_Parent --><div style="padding: 3px;"><A HREF="/{_global_.z}/object/{TID}/?F_U={UP}">{TYP}</A>: <A HREF="/{_global_.z}/edit_obj/{_parent_.F_U}">{NAME} ({_parent_.F_U})</A></div>
+<script>
+	$('.parent-table').find('a').attr('href',$('.parent-table').find('a').attr('href')+'{TID}/?F_U={UP}').html('{TYP}');
+	$('.parent-object').find('a').attr('href',$('.parent-object').find('a').attr('href')+'{_parent_.F_U}').html('{NAME}');
+	$('.parent-table,.parent-object').show();
+	if(getCookie('tips_off')==='1')
+		$('#tipsOff').val('1');
+</script>
+<!-- End:&Uni_obj_Parent -->
+<table id="bki" class="controls hidden">
+	<tr>
+		<td>
+		<FORM method="post" ENCTYPE="multipart/form-data" action="/{_global_.z}/object/{ID}">
+		<input type="hidden" name="_xsrf" value="{_global_.xsrf}">
+		<input type="hidden" name="F_U" value="{F_U}">
+		<input class="btn btn-sm" type="file" name="bki_file">
+		<button name="import" class="btn btn-sm btn-primary"><t9n>[RU]Импорт[EN]Import</t9n>&nbsp;BKI</button>&nbsp;&nbsp;&nbsp;
+		<button type="button" class="btn btn-sm btn-outline-secondary" onclick="$('#controls').toggleClass('hidden'); $('#bki').toggleClass('hidden');">&nbsp;<t9n>[RU]Отменить[EN]Cancel</t9n>&nbsp;</button>
+		</FORM>
+		</td>
+	</tr>
+</table>
+<table id="confirm_del" class="controls hidden">
+	<tr>
+		<td>
+		<b><t9n>[RU]Подтвердите удаление[EN]Confirm to delete the records</t9n>&nbsp;(<span id="2delete"></span>)&nbsp;&nbsp;&nbsp;</b>
+		<nobr>
+			<button type="button" class="btn btn-sm btn-warning" onclick="byId('form').method='post';byId('exp').name='_m_del_select';sendForm('post')">&nbsp;<t9n>[RU]Да, удалить[EN]Yes, delete</t9n>&nbsp;</button>
+			<button type="button" class="btn btn-sm btn-outline-secondary" onclick="$('#controls').toggleClass('hidden'); $('#confirm_del').toggleClass('hidden');">&nbsp;<t9n>[RU]Отменить[EN]Cancel</t9n>&nbsp;</button>
+		</nobr>
+		</td>
+	</tr>
+</table>
+<div id="add" style="display:none">
+<FORM method="post" action="/{_global_.z}/_m_new/{ID}" ONSUBMIT="addbtn.disabled = true; return true;">
+<input type="hidden" name="_xsrf" value="{_global_.xsrf}">
+<input type="hidden" name="up" value="{UP}">
+<div class="input-group controls t9n" style="max-width:640px">
+	<!-- Begin:&New_Req -->{NEW_REQ}
+		<input type="text" id="t{_parent_.TYP}" name="t{_parent_.TYP}" placeholder="{_parent_.VAL}" class="form-control">
+	<!-- End:&New_Req -->
+	<!-- Begin:&New_Req_REPORT_COLUMN -->
+		<select id="t{_parent_.TYP}" name="t{_parent_.TYP}" class="form-control">{NEW_REQ}
+			<!-- Begin:&Rep_Col_List -->
+				<option value="{ID}">{VAL}</option>
+			<!-- End:&Rep_Col_List -->
+		</select>
+	<!-- End:&New_Req_REPORT_COLUMN -->
+	<!-- Begin:&New_Req_GRANT -->
+		<select id="t{_parent_.TYP}" name="t{_parent_.TYP}" class="form-control">{NEW_REQ}
+			<!-- Begin:&Grant_List -->
+				<option value="{ID}">{VAL}</option>
+			<!-- End:&Grant_List -->
+		</select>
+	<!-- End:&New_Req_GRANT -->
+	<div class="input-group-append">
+		<button type="submit" name="addbtn" class="btn btn-primary"><t9n>[RU]Добавить[EN]Create</t9n></button>
+		<button class="btn btn-outline-secondary" onclick="$('#controls,#add').toggle();event.preventDefault();"><t9n>[RU]Отменить[EN]Cancel</t9n></button>
+	</div>
+</div>
+</FORM>
+</div>
+<!-- Begin:&Warnings --><br/><div class="alert alert-danger" role="alert">{WARNING}</div>
+<!-- End:&Warnings -->
+<div class="new-col t9n modal-form shadow hidden mt-1 mr-1">
+	<table>
+		<tr>
+			<td colspan="2">
+				<input id="newCol" type="text" class="form-control" style="margin-bottom: 5px;" placeholder="<t9n>[RU]Имя колонки[EN]Set column name</t9n>" onkeyup="validateNewType()" />
+				<div id="typesBox" style="display:none"></div>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<div><select id="newColBase" class="form-control" onchange="$('#typesBox').hide();validateNewType(true)"></select></div>
+			</td>
+		</tr>
+		<tr>
+			<td align="left" title="<t9n>[RU]Поставьте галку, если это будет справочное значение: Тип, Категория и т.п.[EN]Check this to make a dictionary to pick up values</t9n>">
+				<label><input id="isref" type="checkbox" class="mt-2" onchange="$('#ismulti').toggle()" value="1" />&nbsp;<t9n>[RU]Справочник[EN]Dictionary</t9n></label><br />
+				<label id="ismulti" style="display:none"><input type="checkbox" value="1" />&nbsp;<t9n>[RU]Мульти-выбор[EN]Multi-select</t9n></label>
+			</td>
+			<td align="right"><input type="submit" class="btn btn-primary btn-sm mt-1" id="newColBtn" disabled="disabled" onclick="addCol()" value="<t9n>[RU]Добавить колонку[EN]Add column</t9n>" /></td>
+		</tr>
+	</table>
+</div>
+<FORM id="form" class="freeze-table" method="get" ENCTYPE="multipart/form-data" action="/{_global_.z}/object/{ID}/?F_U={F_U}" onsubmit="sendForm()">
+<div id="tableContainer">
+<TABLE id="tb" class="table tb">
+	<thead>
+	<tr style="background-color:#f5f5f5">
+		<!-- Begin:&Head_Ord_N -->
+		<th ALIGN="center" >{FILLER}N</th>
+		<!-- End:&Head_Ord_N -->
+		<th ALIGN="center" class="t-table {UNIQUE}" OnClick="$('.filter_row').toggleClass('hidden');" id="{ID}" base="{BASE_TYP}"><A title="{ID}" colid="{ID}" HREF="/{_global_.z}/object/{ID}/?{FILTER}&order_val=val" OnClick="event.stopPropagation();">{VAL}</A></th>
+		<!-- Begin:&Uni_Obj_Head -->
+		<th ALIGN="center" class="t-column {REF} {MULTI} {MANDATORY}" OnClick="$('.filter_row').toggleClass('hidden');" id="{TYP}" base="{BASE_TYP}">
+			<div class="col-header"><A title="{TYP}" colid="{TYP}" HREF="/{_global_.z}/object/{ID}/?{FILTER}&order_val={TYP}" OnClick="event.stopPropagation();">{VAL}</A></div>
+		</th>
+		<!-- End:&Uni_Obj_Head -->
+		<!-- Begin:&Uni_Obj_Head_Links -->
+		<th ALIGN="center" OnClick="$('.filter_row').toggleClass('hidden');"><A {VAL}><FONT COLOR="GRAY"><t9n>[RU]Связи[EN]References</t9n></FONT></A></th>
+		<!-- End:&Uni_Obj_Head_Links -->
+		<!-- Begin:&Head_Move_N_Delete -->
+		<th rest="1" OnClick="$('.filter_row').toggleClass('hidden');">{FILLER}&nbsp;</th>
+		<!-- End:&Head_Move_N_Delete -->
+	</tr>
+	</thead>
+	<tbody>
+	<TR id="filter_row" class="filter_row hidden">
+		<!-- Begin:&Head_Ord -->
+		<th style="padding:0px;">{FILLER}&nbsp;</th>
+		<!-- End:&Head_Ord -->
+		<th style="padding:0px;" align="center"><!--{TYP}-->
+			<!-- Begin:&Filter_Val_RCM -->
+				<input type="text" name="{F_TYP}" value="{FILTER}" size="2" style="width:100%; ">
+			<!-- End:&Filter_Val_RCM -->
+			<!-- Begin:&Filter_Val_DNS -->
+				<nobr><input type="text" name="{F_TYP_FR}" value="{FILTER_FR}" size="2" oninput="this.size=this.value.length+1">-</nobr><input type="text" name="{F_TYP_TO}" value="{FILTER_TO}" size="2" oninput="this.size=this.value.length+1">
+			<!-- End:&Filter_Val_DNS -->
+		</th>
+		<!-- Begin:&Uni_Obj_Head_Filter --><!--{TYP}-->
+		<TD style="padding:0px;" align="center">
+			<!-- Begin:&Filter_Req_RCM -->
+				<input type="text" name="{F_TYP}" id="{_parent_.REF}" value="{FILTER}" size="2" style="width:100%;" class="{_parent_.DD}"><ul id="dd{_parent_.REF}" class="dropdown-menu"><img style="margin:1px" width="25px" src="/i/ajax.gif"></ul>
+			<!-- End:&Filter_Req_RCM -->
+			<!-- Begin:&Filter_Req_DNS -->
+				<nobr><input type="text" name="{F_TYP_FR}" value="{FILTER_FR}" size="1" oninput="this.size=this.value.length+1">-</nobr><input type="text" name="{F_TYP_TO}" value="{FILTER_TO}" size="1" oninput="this.size=this.value.length+1">
+			<!-- End:&Filter_Req_DNS -->
+		</TD>
+		<!-- End:&Uni_Obj_Head_Filter -->
+		<script>
+			$("input.dropdown-toggle").attr("data-toggle", "dropdown");
+			$("input.dropdown-toggle").attr("autocomplete", "off");
+			$("input.dropdown-toggle").focus(function(){refreshDD(this.id)});
+			$("input.dropdown-toggle").keyup(function(){refreshDD(this.id)});
+		</script>
+		<!-- Begin:&Uni_Obj_Head_Filter_Links --><!--{VAL}-->
+		<TD style="padding:0px;">
+			&nbsp;
+		</TD>
+		<!-- End:&Uni_Obj_Head_Filter_Links -->
+		<!-- Begin:&Head_Move_N_Delete -->
+		<TD style="padding:0px;">{FILLER}&nbsp;</TD>
+		<!-- End:&Head_Move_N_Delete -->
+	</TR>
+	<!-- Begin:&Uni_Obj_All -->
+	<tr class="data_row" onmouseover="showEdit()" onmouseout="hideEdit()">
+		<!-- Begin:&Ord -->
+		<th style="text-align:right">{ORD}</th>
+		<!-- End:&Ord -->
+		<th ALIGN="{ALIGN}" class="t9n">
+			<A style="display:block" HREF="/{_global_.z}/edit_obj/{ID}" TITLE="<t9n>[RU]Редактировать[EN]Edit</t9n>">
+				<div class="i-edit">
+					<svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<path d="M17.2857 13.09V17.2857C17.2857 17.7025 17.1201 18.1022 16.8254 18.3969C16.5307 18.6916 16.1311 18.8572 15.7143 18.8572H4.71428C4.29751 18.8572 3.89781 18.6916 3.60311 18.3969C3.30841 18.1022 3.14285 17.7025 3.14285 17.2857V6.28574C3.14285 5.86897 3.30841 5.46927 3.60311 5.17457C3.89781 4.87987 4.29751 4.71431 4.71428 4.71431H8.91M15.7143 3.14288L18.8571 6.28574L11 14.1429H7.85714V11L15.7143 3.14288Z" stroke="#777777" stroke-linecap="round" stroke-linejoin="round"/>
+					</svg>
+				</div>
+				{VAL}
+			</A>
+		</th>
+		<!-- Begin:&Uni_Object_View_Reqs -->
+		<TD ALIGN="{ALIGN}"><!-- Begin:&multiselectcell --><span id="{ID}" ref="{VAL}" ord="{ORD}" class="badge badge-pill badge-secondary p-2 ml-0 mt-0 mb-1 mr-1">{NAME}</span><!-- End:&multiselectcell --><div>{VAL}</div></TD>
+		<!-- End:&Uni_Object_View_Reqs -->
+		<!-- Begin:&Uni_Object_View_Reqs_Links -->
+		<TD ALIGN="center">{VAL}<!-- Begin:&Reqs_Links --><A HREF="/{_global_.z}/object/{VALUE}/?lnx=1&F_{LINKS_TYP}=@{_parent_.ID}"><FONT SIZE="-2" COLOR="GRAY">{KEY}</FONT></A>&nbsp;<!-- End:&Reqs_Links -->&nbsp;
+		</TD>
+		<!-- End:&Uni_Object_View_Reqs_Links -->
+		<!-- Begin:&Move_N_Delete -->
+															
+		<TD ALIGN="CENTER" class="t9n pl-1 pr-1 pb-1" style="white-space:nowrap;"><!-- Begin:&Move --><A HREF="#" onclick="post('_m_up/{ID}')" TITLE="<t9n>[RU]Переместить выше[EN]Move up</t9n>"><svg width="26" height="26" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14 21V7M14 7L7 14M14 7L21 14" stroke="#1A1A1A" stroke-linecap="round" stroke-linejoin="round"></path></svg></A>&nbsp;<!-- End:&Move --><A href="#" onclick="post('_m_del/{ID}/?up={_parent_.TYP}&f_u={_parent_.F_U}')" TITLE="<t9n>[RU]Удалить[EN]Delete</t9n>"><svg width="25" height="25" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 8H23M10 8V6C10 5.46957 10.2107 4.96086 10.5858 4.58579C10.9609 4.21071 11.4696 4 12 4H16C16.5304 4 17.0391 4.21071 17.4142 4.58579C17.7893 4.96086 18 5.46957 18 6V8M21 8V22C21 22.5304 20.7893 23.0391 20.4142 23.4142C20.0391 23.7893 19.5304 24 19 24H9C8.46957 24 7.96086 23.7893 7.58579 23.4142C7.21071 23.0391 7 22.5304 7 22V8H21Z" stroke="#1A1A1A" stroke-linecap="round" stroke-linejoin="round"></path></svg></A>
+		</TD>
+		<!-- End:&Move_N_Delete -->
+	</tr>
+	<!-- End:&Uni_Obj_All -->
+	</tbody>
+</TABLE>
+<div id="notfound" style="display:none" class="m-3">
+	<t9n>[RU]Ничего не найдено.[EN]Nothing found.</t9n>
+	<span class="searchlink" style="display:none"><t9n> [RU]Попробовать поискать по вхождению строки:[EN]Try searching for substring:</t9n></span>
+	<div id="searchlink" class="searchlink" style="display:none">
+		<nobr>:column: <a class="link" onclick="setContains(':name:','','%')"><t9n> [RU]начинается с[EN]starts with</t9n> <b>:filter:</b></a> </nobr>
+		<nobr>или <a class="link" onclick="setContains(':name:','%','%')"><t9n> [RU]содержит[EN]contains</t9n> <b>:filter:</b></a></nobr><br />
+	</div>
+	<br /><a target="help" href="https://help.ideav.online/#rec219525382"><t9n class="searchlink">[RU]Правила поиска[EN]Filtering rules</t9n></a>
+</div>
+</div>
+																																										
+<input type="hidden" name="F_I" value="{F_I}">
+<input type="hidden" name="F_U" value="{F_U}">
+<input type="hidden" id="exp" name="" value="1">
+<input type="hidden" id="lnx" name="lnx" value="{LNX}">
+<input type="hidden" id="full" name="full" value="">
+<input type="hidden" id="order_val" name="order_val" value="">
+<input type="hidden" id="desc" name="desc" value="">
+<!-- Begin:_f_show_all -->
+	<input type="hidden" name="f_show_all" value="{_request_.f_show_all}">
+<!-- End:_f_show_all -->
+<input type="hidden" name="_xsrf" value="{_global_.xsrf}">
+<input type="submit" name="prompt" class="btn btn-sm btn-primary hidden">
+</FORM>
+<!-- Begin:&No_Page -->
+<p class="no-pages m-2">
+	<t9n>[RU]Показаны не все записи. Показать[EN]Not all the records shown. Show</t9n>: <a href="/{_global_.z}/object/{ID}/?{lnx}&F_U={F_U}&f_show_all=1&pg=2"><t9n>[RU]следующие[EN]next</t9n></a>
+	<input type="number" min="5" max="1000" id="default_limit" value="{LIMIT}" onchange="setLimit(this.value)">
+</p>
+<br>
+<!-- End:&No_Page -->
+<div class="p8n m-2">
+<!-- Begin:&Uni_Obj_Pages -->
+<span class="ending">{ENDING}</span>&nbsp;&nbsp;<!-- Begin:&Page --><a class="page-link {CLASS}" <!-- Begin:&Page_Href -->href="/{_global_.z}/object/{ID}/?{FILTER}&pg={_parent_.PAGE}"<!-- End:&Page_Href -->> <span >{VAL}</span></a><!-- End:&Page -->
+<!-- End:&Uni_Obj_Pages -->
+</div>
+<div class="edit-table modal-form hidden">
+	<ul class="edit">
+		<li class="change-val change-val-input" style="display:none">
+			<input id="changeVal" class="form-control form-control-sm" onchange="renameTable(this)">
+		</li>
+		<li class="change-val change-val-btn" onclick="$('.change-val').toggle()">
+			<a href="#">
+				<svg width="19" height="22" viewBox="0 0 19 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<path d="M1 21H18M13 1L17 5L6 16H2V12L13 1Z" stroke="#1A1A1A" stroke-linecap="round" stroke-linejoin="round"/>
+					</svg>
+				&nbsp;<t9n>[RU]Переименовать таблицу[EN]Rename the table</t9n>
+			</a>
+		</li>
+		<li class="change-base change-base-select" style="display:none">
+			<select id="changeBase" class="form-control form-control-sm" onchange="changeBase(this)"></select>
+		</li>
+		<li class="change-base change-base-btn" onclick="$('.change-base').toggle()">
+			<a href="#">
+				<svg width="22" height="28" viewBox="6 0 22 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<path d="M6 9V6H22V9M11 22H17M14 6V22" stroke="#1A1A1A" stroke-linecap="round" stroke-linejoin="round"/>
+				</svg>
+				<t9n>[RU]Изменить тип[EN]Сhange type</t9n>
+			</a>
+		</li>
+		<li>
+			<label class="mb-0">
+				<input type="checkbox" class="mt-1 unique" onchange="$('#{ID}').toggleClass('unique');types[{ID}].unique=!types[{ID}].unique;saveType({ID})">
+				&nbsp; <a class="a"><t9n>[RU]Уникальные значения[EN]Unique values</t9n></a>
+			</label>
+		</li>
+		<li id="delTable" onclick="checkDelTable()">
+			<a href="#">
+				<svg width="20" height="22" viewBox="0 0 20 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<path d="M1 5H3M3 5H19M3 5V19C3 19.5304 3.21071 20.0391 3.58579 20.4142C3.96086 20.7893 4.46957 21 5 21H15C15.5304 21 16.0391 20.7893 16.4142 20.4142C16.7893 20.0391 17 19.5304 17 19V5H3ZM6 5V3C6 2.46957 6.21071 1.96086 6.58579 1.58579C6.96086 1.21071 7.46957 1 8 1H12C12.5304 1 13.0391 1.21071 13.4142 1.58579C13.7893 1.96086 14 2.46957 14 3V5M8 10V16M12 10V16" stroke="#1A1A1A" stroke-linecap="round" stroke-linejoin="round"/>
+					</svg>
+				&nbsp;<t9n>[RU]Удалить таблицу[EN]Delete the table</t9n>
+			</a>
+		</li>
+	</ul>
+</div>
+<div class="edit-сolumn modal-form shadow hidden">
+	<ul class="edit">
+		<li class="move-left" onclick="intApi('POST','_d_up/'+colId(this)+'?JSON','reload')">
+			<a href="#">
+				<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<path d="M15 8H1M1 8L8 15M1 8L8 1" stroke="#1A1A1A" stroke-linecap="round" stroke-linejoin="round"/>
+					</svg>
+				&nbsp;<t9n>[RU]Переместить левее[EN]Move left</t9n>
+			</a>
+		</li>
+		<li class="change-val change-val-input" style="display:none">
+			<input id="changeVal" class="form-control form-control-sm" onchange="renameColumn(this)">
+		</li>
+		<li class="change-val change-val-btn" onclick="$('.change-val').toggle()">
+			<a href="#" class="t-req">
+				<svg width="19" height="22" viewBox="0 0 19 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<path d="M1 21H18M13 1L17 5L6 16H2V12L13 1Z" stroke="#1A1A1A" stroke-linecap="round" stroke-linejoin="round"/>
+					</svg>
+				&nbsp;<t9n>[RU]Переименовать колонку[EN]Rename the column</t9n>
+			</a>
+		</li>
+		<li class="change-base change-base-select" style="display:none">
+			<select id="changeBase" class="form-control form-control-sm" onchange="$('#'+colId(this)).attr('base',types[origId(this)].base=this.value);saveType(origId(this))"></select>
+		</li>
+		<li class="change-base change-base-btn t-req" onclick="$('.change-base').toggle()">
+			<a href="#">
+				<svg width="28" height="28" viewBox="6 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<path d="M6 9V6H22V9M11 22H17M14 6V22" stroke="#1A1A1A" stroke-linecap="round" stroke-linejoin="round"/>
+				</svg>
+				<t9n>[RU]Изменить тип[EN]Сhange type</t9n>
+			</a>
+		</li>
+		<li>
+			<label class="mb-0">
+				<input type="checkbox" class="mt-1 mandatory" onchange="$('#'+colId(this)).toggleClass('mandatory');intApi('POST','_d_null/'+colId(this)+'?JSON','')">
+				&nbsp; <a class="a"><t9n>[RU]Обязательно к заполнению[EN]Make mandatory</t9n></a>
+			</label>
+		</li>
+		<!--
+		<li>
+			<a href="#">
+			   <svg width="22" height="22" viewBox="2 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<path d="M7.85714 10.2143L10.2143 12.5714L18.0714 4.7143M17.2857 11V16.5C17.2857 16.9168 17.1201 17.3165 16.8254 17.6112C16.5307 17.9059 16.1311 18.0714 15.7143 18.0714H4.71428C4.29751 18.0714 3.89781 17.9059 3.60311 17.6112C3.30841 17.3165 3.14285 16.9168 3.14285 16.5V5.50002C3.14285 5.08325 3.30841 4.68355 3.60311 4.38885C3.89781 4.09415 4.29751 3.92859 4.71428 3.92859H13.3571" stroke="#1A1A1A" stroke-linecap="round" stroke-linejoin="round"/>
+				</svg>
+				&nbsp;<t9n>[RU]Значение по умолчанию [EN]Set default value</t9n>
+			</a>
+		</li>
+		-->
+		<li class="t-req make-table" onclick="makeTable(colId(this),origId(this))">
+			<a href="#">
+				<svg width="24" height="28" viewBox="3 0 24 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<path d="M10 8H23M10 14H23M10 20H23M6 8C6 8.55228 5.55228 9 5 9C4.44772 9 4 8.55228 4 8C4 7.44772 4.44772 7 5 7C5.55228 7 6 7.44772 6 8ZM6 14C6 14.5523 5.55228 15 5 15C4.44772 15 4 14.5523 4 14C4 13.4477 4.44772 13 5 13C5.55228 13 6 13.4477 6 14ZM6 20C6 20.5523 5.55228 21 5 21C4.44772 21 4 20.5523 4 20C4 19.4477 4.44772 19 5 19C5.55228 19 6 19.4477 6 20Z" stroke="#1A1A1A"/>
+				</svg>
+				&nbsp;<t9n>[RU]Сделать таблицей[EN]Turn into table</t9n>
+			</a>
+		</li>
+		<li class="go-table" style="display:none" onclick="location.href=$(this).find('a').attr('href')">
+			<a href="#">
+				<svg width="24" height="28" viewBox="3 0 24 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<path d="M10 8H23M10 14H23M10 20H23M6 8C6 8.55228 5.55228 9 5 9C4.44772 9 4 8.55228 4 8C4 7.44772 4.44772 7 5 7C5.55228 7 6 7.44772 6 8ZM6 14C6 14.5523 5.55228 15 5 15C4.44772 15 4 14.5523 4 14C4 13.4477 4.44772 13 5 13C5.55228 13 6 13.4477 6 14ZM6 20C6 20.5523 5.55228 21 5 21C4.44772 21 4 20.5523 4 20C4 19.4477 4.44772 19 5 19C5.55228 19 6 19.4477 6 20Z" stroke="#1A1A1A"/>
+				</svg>
+				&nbsp;<t9n>[RU]Перейти к таблице[EN]Go to table</t9n>
+			</a>
+		</li>
+		<li onclick="location.href=$(this).find('a').attr('href')">
+			<a href="#" class="t-ref go-dict">
+				<svg width="28" height="28" viewBox="5 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<path d="M6 21.5C6 20.837 6.26339 20.2011 6.73223 19.7322C7.20107 19.2634 7.83696 19 8.5 19H22M6 21.5C6 22.163 6.26339 22.7989 6.73223 23.2678C7.20107 23.7366 7.83696 24 8.5 24H22V4H8.5C7.83696 4 7.20107 4.26339 6.73223 4.73223C6.26339 5.20107 6 5.83696 6 6.5V21.5Z" stroke="#1A1A1A" stroke-linecap="round" stroke-linejoin="round"/>
+				</svg>
+				<t9n>[RU]Перейти в справочник[EN]Enter the dicrionary</t9n>
+			</a>
+		</li>
+		<li class="change-alias change-alias-input" style="display:none">
+			<input id="changeAlias" class="form-control form-control-sm" onchange="setAlias(this)">
+		</li>
+		<li class="change-alias change-alias-btn" onclick="$('.change-alias').toggle()">
+			<a href="#" class="t-ref">
+				<svg width="28" height="28" viewBox="3 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<mask id="path-1-inside-1_4_98" fill="white">
+				<path d="M23.3933 15.9061L15.9135 23.3879C15.7197 23.582 15.4896 23.7359 15.2363 23.8409C14.983 23.9459 14.7115 24 14.4373 24C14.1631 24 13.8916 23.9459 13.6383 23.8409C13.3851 23.7359 13.155 23.582 12.9612 23.3879L4 14.4348V4H14.4321L23.3933 12.9635C23.7819 13.3545 24 13.8835 24 14.4348C24 14.9862 23.7819 15.5151 23.3933 15.9061Z"/>
+				<path d="M10 9C10 9.55228 9.55228 10 9 10C8.44772 10 8 9.55228 8 9C8 8.44772 8.44772 8 9 8C9.55228 8 10 8.44772 10 9Z"/>
+				</mask>
+				<path d="M23.3933 15.9061L24.1005 16.6132L24.1026 16.6111L23.3933 15.9061ZM15.9135 23.3879L15.2063 22.6809L15.2059 22.6813L15.9135 23.3879ZM12.9612 23.3879L13.6688 22.6813L13.668 22.6805L12.9612 23.3879ZM4 14.4348H3C3 14.7002 3.10548 14.9547 3.29321 15.1423L4 14.4348ZM4 4V3C3.44772 3 3 3.44772 3 4H4ZM14.4321 4L15.1393 3.29299C14.9518 3.10539 14.6974 3 14.4321 3V4ZM23.3933 12.9635L24.1026 12.2586L24.1005 12.2565L23.3933 12.9635ZM22.6861 15.1991L15.2063 22.6809L16.6207 24.0949L24.1005 16.6132L22.6861 15.1991ZM15.2059 22.6813C15.105 22.7824 14.9851 22.8625 14.8533 22.9172L15.6193 24.7647C15.994 24.6093 16.3344 24.3816 16.6211 24.0945L15.2059 22.6813ZM14.8533 22.9172C14.7214 22.9719 14.5801 23 14.4373 23V25C14.843 25 15.2446 24.92 15.6193 24.7647L14.8533 22.9172ZM14.4373 23C14.2946 23 14.1532 22.9719 14.0214 22.9172L13.2553 24.7647C13.63 24.92 14.0317 25 14.4373 25V23ZM14.0214 22.9172C13.8895 22.8625 13.7697 22.7824 13.6688 22.6813L12.2536 24.0945C12.5402 24.3816 12.8806 24.6093 13.2553 24.7647L14.0214 22.9172ZM13.668 22.6805L4.70679 13.7274L3.29321 15.1423L12.2544 24.0953L13.668 22.6805ZM5 14.4348V4H3V14.4348H5ZM4 5H14.4321V3H4V5ZM13.7249 4.70701L22.6861 13.6705L24.1005 12.2565L15.1393 3.29299L13.7249 4.70701ZM22.684 13.6684C22.8864 13.8721 23 14.1476 23 14.4348H25C25 13.6194 24.6774 12.837 24.1026 12.2586L22.684 13.6684ZM23 14.4348C23 14.7221 22.8864 14.9976 22.684 15.2012L24.1026 16.6111C24.6774 16.0326 25 15.2503 25 14.4348H23ZM9 9V11C10.1046 11 11 10.1046 11 9H9ZM9 9H7C7 10.1046 7.89543 11 9 11V9ZM9 9V7C7.89543 7 7 7.89543 7 9H9ZM9 9H11C11 7.89543 10.1046 7 9 7V9Z" stroke="#1A1A1A" mask="url(#path-1-inside-1_4_98)"/>
+				</svg>
+				<t9n>[RU]Задать псевдоним[EN]Set an alias</t9n>
+			</a>
+		</li>
+		<li onclick="intApi('POST','_d_multi/'+colId(this)+'?JSON','multi')">
+			<a class="t-one">
+				<svg width="20" height="16" viewBox="0 0 20 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<path d="M7 2H20M7 8H20M7 14H20M3 2C3 2.55228 2.55228 3 2 3C1.44772 3 1 2.55228 1 2C1 1.44772 1.44772 1 2 1C2.55228 1 3 1.44772 3 2ZM3 8C3 8.55228 2.55228 9 2 9C1.44772 9 1 8.55228 1 8C1 7.44772 1.44772 7 2 7C2.55228 7 3 7.44772 3 8ZM3 14C3 14.5523 2.55228 15 2 15C1.44772 15 1 14.5523 1 14C1 13.4477 1.44772 13 2 13C2.55228 13 3 13.4477 3 14Z" stroke="#1A1A1A"/>
+					</svg>
+				&nbsp;<t9n>[RU]Выбор нескольких значений[EN]Enable multi-select</t9n>
+			</a>
+		</li>
+		<li onclick="intApi('POST','_d_multi/'+colId(this)+'?JSON','multi')">
+			<a class="t-multi">
+				<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<path d="M8.53112 10.6668C8.83787 11.0769 9.22923 11.4162 9.67865 11.6618C10.1281 11.9073 10.6251 12.0533 11.1359 12.0899C11.6467 12.1265 12.1594 12.0528 12.6392 11.8738C13.119 11.6948 13.5548 11.4147 13.9168 11.0525L16.0597 8.90966C16.7103 8.23608 17.0702 7.33393 17.0621 6.39751C17.054 5.46109 16.6784 4.56534 16.0162 3.90316C15.354 3.24099 14.4583 2.86539 13.5218 2.85725C12.5854 2.84911 11.6833 3.20909 11.0097 3.85966L9.78112 5.08109M11.3883 9.23823C11.0815 8.82814 10.6901 8.48881 10.2407 8.24327C9.7913 7.99773 9.29433 7.85172 8.78351 7.81513C8.27269 7.77855 7.75998 7.85225 7.28016 8.03124C6.80033 8.21023 6.36461 8.49032 6.00255 8.85252L3.85969 10.9954C3.20912 11.669 2.84915 12.5711 2.85728 13.5075C2.86542 14.4439 3.24102 15.3397 3.90319 16.0019C4.56537 16.664 5.46112 17.0396 6.39754 17.0478C7.33396 17.0559 8.23611 16.6959 8.90969 16.0454L10.1311 14.8239" stroke="#1A1A1A" stroke-linecap="round" stroke-linejoin="round"/>
+				</svg>
+				&nbsp;<t9n>[RU]Отключить выбор нескольких[EN]Disable multiple select</t9n>
+			</a>
+		</li>
+		<li onclick="intApi('POST','_d_del_req/'+colId(this)+'?JSON','reload')">
+			<a href="#">
+				<svg width="20" height="22" viewBox="0 0 20 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<path d="M1 5H3M3 5H19M3 5V19C3 19.5304 3.21071 20.0391 3.58579 20.4142C3.96086 20.7893 4.46957 21 5 21H15C15.5304 21 16.0391 20.7893 16.4142 20.4142C16.7893 20.0391 17 19.5304 17 19V5H3ZM6 5V3C6 2.46957 6.21071 1.96086 6.58579 1.58579C6.96086 1.21071 7.46957 1 8 1H12C12.5304 1 13.0391 1.21071 13.4142 1.58579C13.7893 1.96086 14 2.46957 14 3V5M8 10V16M12 10V16" stroke="#1A1A1A" stroke-linecap="round" stroke-linejoin="round"/>
+					</svg>
+				&nbsp;<t9n>[RU]Удалить колонку[EN]Delete the column</t9n>
+			</a>
+		</li>
+	</ul>
+</div>
+<a style="left: 8px;" class="i-arrows i-arrow-left" onclick="scrollTb(-0.5)">
+	<svg width="33" height="33" viewBox="0 0 33 33" fill="none" xmlns="http://www.w3.org/2000/svg">
+		<path d="M24.75 16.5H8.25M8.25 16.5L16.5 24.75M8.25 16.5L16.5 8.25" stroke="#1A1A1A" stroke-linecap="round" stroke-linejoin="round"/>
+	</svg>
+</a>
+<a style="right: 8px;" class="i-arrows" onclick="scrollTb(0.5)">
+	<svg width="33" height="33" viewBox="0 0 33 33" fill="none" xmlns="http://www.w3.org/2000/svg">
+		<path d="M8.25 16.5H24.75M24.75 16.5L16.5 8.25M24.75 16.5L16.5 24.75" stroke="#1A1A1A" stroke-linecap="round" stroke-linejoin="round"/>
+	</svg>
+</a>
+<script>
+if(getCookie('tb_size'))
+	$('#tb').css('font-size',getCookie('tb_size')+'px');
+if($('.ending').length===0&&$('.no-pages').length===0&&$('.data_row').length>0)
+    $('.p8n').html('<span class="ending">Всего '+$('.data_row').length+'</span>');
+function setLimit(v){
+	if(parseInt(v)>4){
+		if(parseInt(v)>1000)
+			v=1000;
+		document.cookie='default_limit='+parseInt(v)+'; path=/{_global_.z}/object/{ID}; max-age=31622400';
+		sendForm();
+	}
+	else
+		$('#default_limit').val(20);
+}
+function recalculateTable(){
+	let options = {
+		'scrollBar': true,
+		'shadow': true,
+		'fixedNavbar': '.controls'
+	}
+	$(function() {
+		$('#tableContainer').freezeTable(options);
+	});
+}
+function tbCompact(mode){
+	if(mode){
+		$('#resize,#collapse,#fixed,#ultra').hide();
+		switch(mode){
+			case '1':
+				$('#collapse').show();
+				$('#tb').removeClass('table-sm');
+				$('.data_row td,th').removeClass('fixed-tr').removeClass('fixed-td');
+				document.cookie='table-sm=1; path=/{_global_.z}/object/{ID}; max-age=0';
+				break;
+			case '2':
+				$('#fixed').show();
+				$('#tb').addClass('table-sm');
+				document.cookie='table-sm=2; path=/{_global_.z}/object/{ID}; max-age=31622400';
+				break;
+			case '3':
+				$('#tb').addClass('table-sm');
+				$('.data_row td,th').addClass('fixed-tr');
+				$('#ultra').show();
+				document.cookie='table-sm=3; path=/{_global_.z}/object/{ID}; max-age=31622400';
+				break;
+			case '4':
+				$('#resize').show();
+				$('.data_row td,th').removeClass('fixed-tr').addClass('fixed-td');
+				$('#tb').addClass('table-sm');
+				document.cookie='table-sm=4; path=/{_global_.z}/object/{ID}; max-age=31622400';
+				break;
+		}
+		recalculateTable();
+	}
+}
+tbCompact(getCookie('table-sm'));
+var msColors=['78AAD2','78AAFF','78D2AA','78D2FF','78FFAA','78FFD2','AA78D2','AA78FF','AAD278','AAD2FF','AAFF78','AAFFD2','D278AA','D278FF','D2AA78','D2AAFF','D2FF78','D2FFAA','FF78AA','FF78D2','FFAA78','FFAAD2','FFD278','FFD2AA'];
+$('.badge').each(function(){$(this).css('background-color','#'+msColors[$(this).attr('ref')%24])});
+function changeBase(el){
+	console.log(el.value.length);
+	if(el.value.length>0){
+		$('#{ID}').attr('base',types[{ID}].base=el.value);saveType({ID});
+	}else{
+		$(el).val(types[{ID}].base);
+	}
+}
+function renameColumn(el){
+	if(el.value.length>0)
+		types[origId(el)].val=el.value;
+	$('#'+colId(el)+' a[colid]').html(types[origId(el)].val);
+	saveType(origId(el));
+}
+function renameTable(el){
+	if(el.value.length>0)
+		types[id].val=el.value;
+	$('#'+id+' a[colid]').html(types[id].val);
+	saveType(id);
+}
+function setAlias(el){
+	if(el.value.length>0)
+		$('#'+colId(el)+' a[colid]').html(el.value);
+	else
+		$('#'+colId(el)+' a[colid]').html(getOrig(colId(el)));
+	var fd = new FormData();
+	fd.append('val',el.value);
+	intApi('POST','_d_alias/'+colId(el)+'?JSON','',fd);
+}
+function getOrig(id){
+	for(i in reqs)
+		if(i==id)
+			return types[reqs[i].orig].val;
+}
+function saveType(id){
+	var fd = new FormData();
+	fd.append('val',types[id].val);
+	fd.append('t',types[id].base);
+	if(types[id].unique)
+		fd.append('unique',types[id].unique);
+	intApi('POST','_d_save/'+id+'?JSON','saveType',fd,id);
+}
+function makeTable(column,orig){
+	for(var i in reqs)
+		if(reqs[i].orig===orig&&i!==column)
+			return $('#warn').html(t9n('[RU]Эта колонка используется в другой таблице. Создайте новый термин для вашей колонки'
+							+'.[EN]This term is used in another table as plain field. Create another term.')).removeClass('hidden');
+	location.href='/'+db+'/object/'+orig+'?F_U=1';
+}
+function checkDelTable(){
+	var wait,i,j;
+	for(i in types)
+		if(types[i].ref===id){
+			for(j in reqs)
+				if(reqs[j].orig===i)
+					return $('#warn').html(t9n('[RU]Эта таблица используется как справочник!'
+						+'[EN]This table is a dicitionary for another table!')
+						+' <a href="/{_global_.z}/object/'+reqs[j].parent+'">'+types[reqs[j].parent].val+'</a>').removeClass('hidden');
+			wait=true,intApi('POST','_d_del/'+i+'?JSON','delRef','',id);
+		}
+	for(j in reqs)
+		if(reqs[j].orig===id)
+			return $('#warn').html(t9n('[RU]Эта таблица подчинена другой таблице!'
+				+'[EN]This table is a property of another table!')
+				+' <a href="/{_global_.z}/object/'+reqs[j].parent+'">'+types[reqs[j].parent].val+'</a>').removeClass('hidden');
+	if($('.data_row').length>0)
+		return $('#del').click();
+	if(!wait)
+		intApi('POST','_d_del/'+id+'?JSON','del');
+}
+function origId(el){
+	return reqs[colId(el)].orig;
+}
+function colId(el){
+	return $(el).closest('.edit-сolumn').attr('colid');
+}
+function scrollTb(x){
+	$('#tableContainer').animate({scrollLeft:$('#tableContainer').scrollLeft()+jQuery('#tableContainer').outerWidth()*x},250);
+}
+function tableAction(){
+	intApi('POST','_d_del_req/'+index+'?JSON&t='+json.obj,'reload')
+}
+function addCol(){
+	var formData = new FormData();
+	formData.append('val',$('#newCol').val());
+	formData.append('t',$('#newColBase').val());
+	$('#newColBtn').prop('disabled',true);
+	if($('#isref').prop('checked'))
+		intApi('POST','_d_new?JSON','newRef',formData,id);
+	else
+		intApi('POST','_d_new?JSON','newCol',formData,id);
+}
+function validateNewType(manual){
+    console.log(event.keyCode);
+	var val=$('#newCol').val().toLowerCase(),base=$('#newColBase').val();
+	if(event.keyCode===27)
+	    $('#typesBox').hide();
+	else if(!manual)
+    	drawTypesBox(val);
+	if(val.length>0&&base.length>0)
+		return $('#newColBtn').prop('disabled',false);
+	$('#newColBtn').prop('disabled',true);
+}
+function chooseType(i){
+	$('#typesBox').hide();
+	$('#newCol').val(types[i].val);
+	$('#newColBtn').prop('disabled',false);
+	if(types[i].ref){
+		$('#newColBase').val(types[types[i].ref].base);
+		$('#isref').prop('checked',true);
+		$('#ismulti').show();
+	}
+	else{
+		$('#newColBase').val(types[i].base);
+		$('#isref').prop('checked',false);
+		$('#ismulti').hide();
+	}
+}
+function drawTypesBox(val){
+	var list='',i,j=0,valLayout=autoLayout(val);
+	for(i in types)
+		if(j<10&&notReq(i)&&((val||'')===''||types[i].val.toLowerCase().indexOf(val)!==-1||types[i].val.toLowerCase().indexOf(valLayout)!==-1)){
+			list+='<a class="nodeco" onclick="chooseType('+types[i].id+')"><p class="p-2 mb-0">'
+						+(types[i].ref?t9n('[RU]Справочник [EN]Dictionary '):'')+types[i].val
+				+'</p></a>';
+			j++;
+		}
+	if(list===''||val==='')
+		return $('#typesBox').hide();
+	$('#typesBox').html(list).show();
+}
+function notReq(i){
+	if(!types[i].ref)
+		for(var j in reqs)
+			if(reqs[j].orig===i&&reqs[j].parent===id)
+				return false;
+	return true;
+}
+if(search['full']!=undefined){
+	$('#full').value=1;
+	$('#limit-text,#full-text').toggle();
+}
+// Put the order mark on the column header
+if(search.order_val)$('a[colid='+search.order_val+']').parent().prepend(search.desc?'&#9660; ':'&#9650; ');
+if(search['order_val']!=undefined){
+	byId('order_val').value=search['order_val'];
+	if(search['desc']!=undefined)
+		byId('desc').value=0;
+}
+var filter="{filter}" // Imortant to use "" here
+	,ajax='<img style="margin:1px" width="16px" src="/i/ajax.gif">';
+function count2del(){
+	$('#2delete').html(ajax);
+	intApi('GET','object/'+id+'?JSON&_count'+filter,'count2del');
+}
+var table = document.getElementById("tb");
+// Remove empty inputs and input duplicates from cloned freeze-table objects
+function sendForm(method){
+	var dupes=[];
+	$('#form').find('input, textearea, select').each(function(){
+		if(this.value==''||(this.name=='_xsrf' && method!='post'))
+			$(this).remove();
+		if(dupes[this.name]!==undefined)
+			$(this).remove();
+		else
+			dupes[this.name]=1;
+	});
+	byId('form').onsubmit='';
+	byId('form').submit();
+}
+function addAnArrow () {
+	const th = document.getElementsByTagName('thead')[0].children[0].children;
+	for (let index = 0; index < th.length; index++)
+		$(th[index]).append('<div class="edit-btn">'
+				+'<svg class="'+($(th[index]).hasClass('t-table')?'edit-btn-table':'edit-btn-column')+'" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">'
+				+'	<path d="M8 8.57145C8.31559 8.57145 8.57143 8.31561 8.57143 8.00002C8.57143 7.68443 8.31559 7.42859 8 7.42859C7.68441 7.42859 7.42857 7.68443 7.42857 8.00002C7.42857 8.31561 7.68441 8.57145 8 8.57145Z" stroke="#777777" stroke-linecap="round" stroke-linejoin="round"/>'
+				+'	<path d="M12 8.57145C12.3156 8.57145 12.5714 8.31561 12.5714 8.00002C12.5714 7.68443 12.3156 7.42859 12 7.42859C11.6844 7.42859 11.4286 7.68443 11.4286 8.00002C11.4286 8.31561 11.6844 8.57145 12 8.57145Z" stroke="#777777" stroke-linecap="round" stroke-linejoin="round"/>'
+				+'	<path d="M4 8.57145C4.31559 8.57145 4.57143 8.31561 4.57143 8.00002C4.57143 7.68443 4.31559 7.42859 4 7.42859C3.68441 7.42859 3.42857 7.68443 3.42857 8.00002C3.42857 8.31561 3.68441 8.57145 4 8.57145Z" stroke="#777777" stroke-linecap="round" stroke-linejoin="round"/>'
+				+'</svg></div>');
+}
+function addingTD () {
+	const trTbody = document.getElementsByTagName('tbody')[2].children;
+	for (let index = 0; index < trTbody.length; index++) {
+		const element = trTbody[index];
+		const td = document.createElement('td');
+		td.style.textAlign = 'left'
+		element.append(td)
+	}
+}
+function addAColumToCreate () {
+	const tr = document.getElementsByTagName('thead')[0].children[0];
+	const newTh = document.createElement('th');
+	newTh.classList.add('th-plus');
+	const span = document.createElement('span');
+	span.textContent = '+';
+	span.classList.add('th-plus__span')
+	newTh.append(span);
+	tr.append(newTh);
+}
+function checkTypes(){
+	if(types===undefined)
+		newApi('GET','edit_types?JSON','typesCB');
+	else
+		validateNewType();
+}
+function hideUnHide(element){
+	if(element.classList.contains('hidden'))
+		element.classList.remove('hidden')
+	else
+		element.classList.add('hidden');
+}
+if('{_global_.role}'==='admin'){
+	addAnArrow();
+	addAColumToCreate();
+	let str='<option value="" class="text-muted">'+t9n('[RU]Выберите тип колонки[EN]Select first column\'s type')+'</option>'
+		+'<option value="3" selected>'+t9n('[RU]Короткая строка (до 127 символов)[EN]Short text (up to 127 chars)')+'</option>'
+		+'<option value="8">'+t9n('[RU]Строка без ограничения длины[EN]Text of unlimiited length')+'</option>'
+		+'<option value="9">'+t9n('[RU]Дата[EN]Date')+'</option>'
+		+'<option value="13">'+t9n('[RU]Целое число[EN]Integer')+'</option>'
+		+'<option value="14">'+t9n('[RU]Число с десятичной частью[EN]Amount with decimals')+'</option>'
+		+'<option value="11">'+t9n('[RU]Логическое значение (Да / Нет)[EN]Boolean: True/False')+'</option>'
+		+'<option value="12">'+t9n('[RU]Многострочный текст[EN]Multiline text')+'</option>'
+		+'<option value="4">'+t9n('[RU]Дата и время[EN]Date and time')+'</option>'
+		+'<option value="10">'+t9n('[RU]Файл[EN]File')+'</option>';
+	$('#newColBase,#changeBase').html(str);
+ const thPlus = document.querySelector('.th-plus');
+   thPlus.addEventListener('click', (e) => {
+	checkTypes();
+	const inputAdd = thPlus.querySelector('.input-add');
+	const span = thPlus.querySelector('.th-plus__span');
+		$('.modal-form').addClass('hidden');
+		$('.new-col').removeClass('hidden');
+		$('#newCol').focus();
+		e.stopPropagation();
+   })
+   const editBtnTable = document.querySelector('.edit-btn-table');
+	const editTable = document.querySelector('.edit-table');
+	editBtnTable.addEventListener('click', (e) => {
+		$('.modal-form').addClass('hidden');
+		e.stopPropagation();
+		checkTypes();
+		hideUnHide(editTable);
+		const coord = editBtnTable.getBoundingClientRect();
+		const bottom = coord.bottom;
+		const left = coord.left;
+		$('.unique').prop('checked',$(event.target).closest('th').hasClass('unique'));
+		$('.change-base-select,.change-val-input,.change-alias').hide();
+		$('.change-base-select select').val($(event.target).closest('th').attr('base'));
+		$('.change-val-input input').val($(event.target).closest('th').find('a[colid]').html());
+		$('.change-base-btn,.change-val-btn,.change-alias-btn').show();
+		editTable.style.top = bottom + 2 + window.scrollY + 'px';
+		editTable.style.left = left + window.scrollX - 65 + 'px';
+	})
+	const editBtncolumn = document.querySelectorAll('.edit-btn-column');
+	const editColum = document.querySelector('.edit-сolumn');
+	editBtncolumn.forEach((btn,i) => {
+		btn.addEventListener('click', (e) => {
+			$('.modal-form').addClass('hidden');
+			e.stopPropagation();
+			checkTypes();
+			hideUnHide(editColum);
+			const coord = btn.getBoundingClientRect();
+			const bottom = coord.bottom;
+			const left = coord.left,colId=$(event.target).closest('th').attr('id');
+			if(i===0)
+				$('.move-left').hide();
+			else
+				$('.move-left').show();
+			$(editColum).attr('colid',colId);
+			$('.change-base-select,.change-val-input,.change-alias').hide();
+			$('.change-base-select select').val($(event.target).closest('th').attr('base'));
+			$('.change-val-input input').val($(event.target).closest('th').find('a[colid]').html());
+			$('.change-alias-input input').val($(event.target).closest('th').find('a[colid]').html());
+			$('.change-base-btn,.change-val-btn').show();
+			$('.mandatory').prop('checked',$(event.target).closest('th').hasClass('mandatory'));
+			if(!$(event.target).closest('th').hasClass('t-ref')){
+				$('.edit-сolumn .t-ref,.edit-сolumn .t-multi,.edit-сolumn .t-one,.t-req').closest('li').hide();
+				$('.t-req').closest('li').show();
+				$('.go-table').hide();
+				if(types)
+					setupTableReq(colId);
+				else
+					$('.make-table').attr('make-table',colId);
+			}
+			else{
+				if(types)
+					$('.go-dict').attr('href','/'+db+'/object/'+types[reqs[colId].orig].ref).attr('target',types[reqs[colId].orig].ref);
+				else
+					$('.go-dict').attr('go-dict',colId);
+				if($(event.target).closest('th').hasClass('t-multi'))
+					$('.edit-сolumn .t-multi,.edit-сolumn .t-ref').closest('li').show(),$('.edit-сolumn .t-one,.t-req').closest('li').hide();
+				else
+					$('.edit-сolumn .t-multi,.t-req').closest('li').hide(),$('.edit-сolumn .t-ref,.edit-сolumn .t-one').closest('li').show();
+			}
+			editColum.style.top = bottom + 2 + window.scrollY + 'px';
+			editColum.style.left = left + window.scrollX - 150 + 'px';
+		})
+	})
+}
+function setupTableReq(colId){
+	for(var i in reqs)
+		if(reqs[i].parent===colId){
+			$('.go-table').attr('onclick','location.href="/'+db+'/object/'+colId+'?F_U=1"').show();
+			$('.make-table').hide();
+			break;
+		}
+}
+</script>
+<!-- End:&Uni_obj -->
+<script>
+$('.data_row').find('td').each(function(){ // restore the line breaks
+	$(this).html($(this).html().replace(/[\t\ n]+$/gm,'').replace(/\n/gm,'<br />'));
+});
+let typeOption='<option value=":id:" id=":id:">:name:</option>';
+// Функция для отправки асинхронного запроса по https api с обработкой его результата
+function intApi(m,u,b,vars,index){ // Параметры: метод, адрес, действие - ветка switch, параметры, ID целевого элемента
+	vars=vars||''; // По умолчанию список параметров пуст
+	var h='',i,j,json,obj=new XMLHttpRequest(); // Объявляем переменную под JSON и API по HTTPS
+	obj.open(m,'/'+db+'/'+u,true); // Открываем асинхронное соединение заданным методом по нужному адресу
+	if(m=='POST'){ // Если это POST запрос, то передаем заданные параметры
+		if(typeof vars=='object')
+			vars.append('_xsrf',xsrf);
+		else{
+			obj.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
+			vars='_xsrf='+xsrf+'&'+vars; // добавляем токен xsrf, необходимый для POST-запроса
+		}
+	}
+	$('#warn').html('').addClass('hidden');
+	obj.onload=function(e){ // Когда запрос вернет результат - сработает эта функция
+		try{ // в this.responseText лежит ответ от сервера
+			json=JSON.parse(this.responseText); // Пытаемся разобрать ответ как JSON
+		}
+		catch(e){ // Если произошла ошибка при разборе JSON
+			h=this.responseText;
+			$('#warn').html(h).removeClass('hidden');
+		}
+		obj.abort(); // Закрываем соединение
+		switch(b){ // Отрабатываем заданную команду - переходим в соответствующую ветку case
+			case 'count2del':
+				$('#2delete').html(json.count||'<a onclick="count2del()" title="'+t9n('[RU]Не удалось подсчитать количество записей. Кликните, чтобы попытаться снова.[EN]Failed to count the objects number, click here to try again')+'">*</a>');
+				break;
+			case 'newRef':
+				if(json.obj)
+					intApi('POST','_d_ref/'+json.obj+'?JSON','newCol','',index);
+				break;
+			case 'new-multi':
+				if(json.obj)
+					intApi('POST','_d_multi/'+json.id+'?JSON','reload');
+				break;
+			case 'newCol':
+				if(json.obj)
+					if($('#ismulti input').prop('checked'))
+						intApi('POST','_d_req/'+index+'?JSON&t='+json.obj,'new-multi','',index);
+					else
+						intApi('POST','_d_req/'+index+'?JSON&t='+json.obj,'reload');
+				break;
+			case 'delRef':
+				if(json.id)
+					intApi('POST','_d_del/'+index+'?JSON','del');
+				else
+					$('#warn').html(h+JSON.stringify(json)).removeClass('hidden');
+				break;
+			case 'del':
+				if(json.id)
+					location.href='/'+db+'/dict';
+				else
+					$('#warn').html(h+JSON.stringify(json)).removeClass('hidden');
+				break;
+			case 'reload':
+				if(json.id)
+					location.reload();
+				else
+					$('#warn').html(h+JSON.stringify(json)).removeClass('hidden');
+				break;
+			case 'multi':
+				if(json.id){
+					if($('#'+json.id).hasClass('t-multi'))
+						$('#'+json.id).removeClass('t-multi');
+					else
+						$('#'+json.id).addClass('t-multi');
+					$('.edit-сolumn .t-multi,.edit-сolumn .t-one').closest('li').toggle();
+				}
+				break;
+			case 'def_ref_dd':
+				if(json.object!==undefined){
+					for(i in json.object)
+						h+='<li class="p-2"><a onclick="byId('+json.type.id+').value=this.innerHTML;sendForm()">'+json.object[i].val+'</a></li>';
+					$('#dd'+json.type.id).html(h);
+					if($('#dd'+json.type.id).is(":hidden"))
+						$('#dd'+json.type.id).dropdown('toggle');
+				}
+				break;
+		}
+	}
+	obj.send(vars); // отправили запрос и теперь будем ждать ответ, а пока - выходим
+}
+var types,reqs={};
+function refreshDD(id){
+	intApi('GET','object/'+id+'?JSON&F_'+id+'=%25'+byId(id).value+'%25','def_ref_dd');
+}
+$(document).ready(function(){
+	if($('#del').length===0)
+		$('#delTable').remove();
+});
+// Callback newApi functions are named with the CB suffix
+function typesCB(json,index){
+	types={};
+	dataItems=json.edit_types;
+	dataTypes=json.types;
+	for(var i in dataItems.id){
+		types[dataItems.id[i]]={ref:(dataItems.ref_val===''?'':dataItems.ref_val[i])
+								,val:dataItems.val[i]
+								,base:dataItems.t[i]
+								,id:dataItems.id[i]
+								,unique:(dataItems.uniq[i]==='1')};
+		if(dataItems.req_id[i]!=='')
+			reqs[dataItems.req_id[i]]={attrs:dataItems.attrs[i]
+									,orig:dataItems.req_t[i]
+									,parent:dataItems.id[i]};
+	}
+	$('.go-dict[go-dict]').each(function(){
+		i=types[reqs[$(this).attr('go-dict')].orig].ref;
+		this.href='/'+db+'/object/'+i;
+		$(this).attr('target',i);
+	});
+	$('.make-table').each(function(){
+		setupTableReq($(this).attr('make-table'));
+	});
+	if($('#newCol').is(':visible'))
+		validateNewType();
+}
+function setContains(n,pre,post){
+	$('.filter_row').find('input[name="'+n+'"]').each(function(){
+		this.value=pre+this.value.replace(/%/g,'')+post
+	});
+	$('#form').submit();
+}
+if($('#tb tbody tr').length===1){
+	var html='',colid;
+	$('.filter_row').find('input[value!=""][name^="F_"]').each(function(){
+		if((this.value.substr(0,1)!=='%')||(this.value.substr(-1)!=='%'))
+			html+=$('#searchlink').html().replace(':column:',$('a[colid='+$(this).attr('name').substr(2)+']').html())
+								.replace(/:filter:/g,this.value.replace(/%/g,''))
+								.replace(/:name:/g,$(this).attr('name'));
+	});
+	if(html!==''){
+		$('#searchlink').html(html);
+		$('.searchlink').show();
+	}
+	else if($('.filter_row').find('input[value!=""]').length===0)
+		$('#notfound').html(t9n('[RU]Таблица пуста. Нажмите + слева вверху, чтобы добавить записи.[EN]The table is empty. Press + in the upper left to add a record.'));
+	$('#notfound').show();
+}
+var compactTogglerStyle =  `
+@media screen and (max-width:800px){
+	td, th {
+		display: block;
+		float: left;
+		border: 1px solid #c8c8c8;
+	}
+	tr {
+		border: 1px solid #c8c8c8;
+	}
+	thead {
+		display: block;
+		background-color: #fff;
+		position: sticky;
+		top: 0;
+	}
+	td div {
+		min-height: 1.6rem;
+		line-height: 1.6rem;
+		white-space: normal;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		display: -webkit-box;
+		-webkit-line-clamp: 4; /* number of lines to show */
+		-webkit-box-orient: vertical;
+	}
+	.clone-scroll-bar-wrap {
+		pointer-events: none;
+	}
+`
+window.addEventListener('load',function(){
+	Object.defineProperty(Array.prototype, 'chunk_inefficient', {
+		value: function(chunkSize) {
+		  var array = this;
+		  return [].concat.apply([],
+			array.map(function(elem, i) {
+			  return i % chunkSize ? [] : [array.slice(i, i + chunkSize)];
+			})
+		  );
+		}
+	  });
+	  recalculateTable();
+	$(window).resize(function(){
+		if($('#tableContainer').offset().top+$('#tableContainer').height()>$('.footer').offset().top)
+			$('.i-arrows').show();
+		else
+			$('.i-arrows').hide();
+	});
+	$('.i-arrow-left').css('left',$('#tb th')[0].clientWidth);
+	$(window).scroll(function(){$(window).resize();});
+	$(window).resize();
+	$(window).click(function(){
+		if($(event.target).closest('.modal-form').length===0)
+			$('.modal-form').addClass('hidden');
+	});
+	if(getCookie('tips_off')==='1')
+		$('#tipsOff').val('1');
+	$('#tbSize').val(getCookie('tb_size')||'16');
+	if(search.saved1||search.new1||search.copied1||search.canc1||search.F_I){
+		$('.ending').append(' <a onclick="location.href=$(\'#clearSearch\').attr(\'href\')" href="#">Показать остальные записи</a>');
+		$('#clearSearch').removeClass('hidden');
+	}
+});
+if(byId("filter_row")){
+	var filters=byId("filter_row").getElementsByTagName("input");
+	for(i=0;i<filters.length;i++)
+		if(filters[i].value!="") {
+			filters[i].size=filters[i].value.length + 1;
+			$('.filter_row,#clearSearch').removeClass('hidden');
+		}
+}
+<!-- Begin:_NoObj -->
+else{
+	byId('warn').innerHTML=t9n('[RU]Объект {_request_.f_u} не найден, вероятно, он был удален[EN]Object $id not found (it might be deleted)');
+	byId('warn').classList.remove('hidden');
+}
+<!-- End:_NoObj -->
+if(search.exists1){
+	byId('warn').innerHTML=t9n('[RU]Запись уже существует[EN]The record already exists');
+	byId('warn').classList.remove('hidden');
+	setTimeout(function(){byId('warn').classList.add('hidden')},7000);
+}
+</script>
+		
